@@ -1,0 +1,183 @@
+//este programa tiene errores de compilacion
+#include <iostream>
+#include <windows.h>
+#define HASHMAX 10
+
+using namespace std;
+
+typedef struct nodoL
+{
+    int info;
+    nodoL * sig;
+    nodoL * ant;
+} nodo;
+
+typedef nodo* lista;
+
+// DEFINICIÓN DE LAS FUNCIONES
+//************* HASH **********
+
+typedef lista Hash[HASHMAX];
+int HashClave(int n);
+void HashInsertar(Hash &h, int e);
+void HashMostrar(Hash h);
+void HashBuscar(Hash h, int n);
+
+//********  LISTA   *******
+void enlistar (lista &L, int n);
+int mostrar(lista L);/* muestra por pantalla los valores de L, en forma recursiva */
+void borrar(lista &L, int n);
+
+int HashClave (int n)
+{
+    return n%HASHMAX;
+}
+
+void HashInsertar (Hash &h, int e)
+{
+    enlistar ((h)[HashClave(e)],e);
+}
+
+void enlistar (lista &L, int n)
+{
+    lista aux = new nodoL;
+    if(L==NULL)
+    {
+        aux -> info = n;
+        aux -> sig = L;
+        L=aux;
+    }
+    else
+    {
+        if((L)->info>n) // Para que quede ordenado
+        {
+            aux -> info = n;
+            aux -> sig = L;
+            L=aux;
+        }
+        else
+        {
+            enlistar(L->sig,n); //<-- warning: passing argument 1 of 'enlistar' from incompatible pointer type [enabled by default]
+        }
+    }
+}
+
+int mostrar (lista L)
+{
+    int i=0;
+    if(L!=NULL)
+    {
+        i=1;
+        cout << "[" << L->info << "]->";
+        mostrar(L->sig);
+    }
+    return i;
+}
+
+void HashMostrar(Hash h)
+{
+    int i, n;
+    for (n=0; n<HASHMAX; n++)
+    {
+        cout << "Hash ["<<n<<"]: ";
+        i=mostrar(h[n]);
+        if(i==0)cout << "Lista  vacia " <<endl << endl;
+        else cout << "#" << endl << endl;
+    }
+}
+
+void borrar(lista *L, int n)
+{
+    lista aux = *L; //puntero auxiliar al primer nodo
+    lista ant = NULL;
+    if(aux==NULL)
+    {
+        cout << "Error: Lista vacia";
+    }
+    else
+    {
+        while (aux->info!=n&&aux->sig!=NULL)
+        {
+            ant=aux;
+            aux=aux->sig;
+        }
+        if(aux->sig==NULL&&aux->info!=n)
+               cout << "Error, numero no se encuentra en la lista";
+        else
+        {
+            ant->sig=aux->sig;
+            delete aux;   //elimino el nodo de la memoria
+        }
+    }
+}
+
+int main()
+{
+    //Se declara y asigna una la variable para controlar la opción seleccionada en el menú.
+    int op=-1;
+    int i;
+    //Se declara una variable milista de tipo lista.
+    lista milista=NULL;
+    //Se declara una variable h de tipo Hash
+    Hash h;
+    //Mientras op se distinto de 0 (Cuando es op=0 finaliza el programa.)
+    while(op)
+    {
+        system("cls"); //Borrar la pantalla.
+        //Mostrar en pantalla las opciones del menú.
+        cout << "\t\tEjemplo de Hash" << endl <<endl << "\tSeleccione una opcion" << endl <<endl <<"\t-1. Agregar elemento a la lista" <<endl << "\t-2. Mostrar lista" << endl << "\t-3. Borrar un elemento" << endl << "\t-0. Salir" <<endl;
+        cin >> op; //Captura el numero opción seleccionada.
+        switch(op) //Ir a la opción indicada por el usuario.
+        {
+            //Ingresar un valor al comienzo de la lista.
+        case 1:
+        {
+            int e, n;//Crear una variable para el número a insertar en la lista llamada e y otra para la clave del hash llamada n
+            system("cls");//Borrar la pantalla.
+            cout << "Ingrese la clave del hash para el elemento:" << endl;
+            cin >> n;
+            cout << "Ingrese el numero para agregar a la lista, 0 para terminar:" << endl;//Pedir por pantalla un número para insertar en la lista.
+            do{
+                cin >> e;//Capturar el número a insertar en la lista.
+                HashInsertar(h,e);//<-------LLamará al procedimiento que inserta un numero al hash.
+                cout << e << " se ha agregado con exito a la lista" << endl;
+            }while (e != 0);
+            system("pause");
+            break;
+        }
+        //Mostrar lista por pantalla.
+        case 2:
+        {
+            system("cls");//Borrar la pantalla.
+            //Mostrar en pantalla un titulo.
+            cout << "Los numeros cargados en la lista:" << endl << endl;
+            //Declarar un variable y asignarle el valor devuelto por la función mostrar (0 Lista vacía 1 Lista no vacía).
+            i = mostrar(milista);
+            //Chequear si la lista esta vacía y mostrar en pantalla el exto que corresponda.
+            if(i==0)
+                cout << "La lista esta vacia" <<endl <<endl;
+            else
+                cout << "# "<<endl <<endl;
+            //Esperar que el usuario presione una tecla.
+            system("pause");
+        }
+        break;
+        //Eliminar un número de la lista.
+        case 3:
+        {
+            int n; //Crear un varible que almacene el número a borrar de la lista.
+            system("cls"); //Borrar la pantalla.
+            cout << "Ingrese el numero para borrar de la lista:" << endl; //Pedir por pantalla un nuúmero para borrar de la lista.
+            cin >> n; //Capturar el número a borrar de la lista.
+            system("cls"); //Borrar la pantalla.
+            borrar(&milista,n); //LLamar a la función borrar.
+            if(i==0)
+                cout << "Elemento borrado de la lista. Pulse cualquier tecla para regresar" << endl;
+            system("pause"); //Esperar que el usuario presione una tecla.
+            break;
+        }
+        }
+    }
+    system("pause");
+    return 0;
+}
